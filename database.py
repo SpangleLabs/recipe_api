@@ -28,24 +28,32 @@ class Database:
         cur = self.conn.cursor()
         recipes = []
         for row in cur.execute("SELECT recipe_id, name, prep, recipe FROM recipes"):
-            ingredients = self.list_ingredients_for_recipe(row.recipe_id)
-            history = self.list_history_for_recipe(row.recipe_id)
-            schedule = self.list_schedule_for_recipe(row.recipe_id)
-            recipes.append(FullRecipe(row.recipe_id, row.name, ingredients, row.prep, row.recipe, history, schedule))
+            ingredients = self.list_ingredients_for_recipe(row["recipe_id"])
+            history = self.list_history_for_recipe(row["recipe_id"])
+            schedule = self.list_schedule_for_recipe(row["recipe_id"])
+            recipes.append(FullRecipe(
+                row["recipe_id"],
+                row["name"],
+                ingredients,
+                row["prep"],
+                row["recipe"],
+                history,
+                schedule
+            ))
         return recipes
 
     def list_ingredients_for_recipe(self, recipe_id: int) -> List[Ingredient]:
         cur = self.conn.cursor()
         ingredients = []
         for ingredient in cur.execute("SELECT amount, item FROM ingredients WHERE recipe_id = ?", (recipe_id,)):
-            ingredients.append(Ingredient(ingredient.amount, ingredient.item))
+            ingredients.append(Ingredient(ingredient["amount"], ingredient["item"]))
         return ingredients
 
     def list_schedule_for_recipe(self, recipe_id: int) -> List[ScheduleEntryForRecipe]:
         cur = self.conn.cursor()
         schedule = []
         for entry in cur.execute("SELECT date FROM schedule WHERE recipe_id = ?", (recipe_id,)):
-            schedule.append(ScheduleEntryForRecipe(dateutil.parser.parse(entry.date)))
+            schedule.append(ScheduleEntryForRecipe(dateutil.parser.parse(entry["date"])))
         return schedule
 
     def list_history_for_recipe(self, recipe_id: int) -> List[HistoryEntryForRecipe]:
@@ -53,9 +61,9 @@ class Database:
         history = []
         for entry in cur.execute("SELECT date, start_time, end_time FROM history WHERE recipe_id = ?", (recipe_id,)):
             history.append(HistoryEntryForRecipe(
-                dateutil.parser.parse(entry.date),
-                dateutil.parser.parse(entry.start_time) if entry.start_time is not None else None,
-                dateutil.parser.parse(entry.end_time) if entry.end_time is not None else None
+                dateutil.parser.parse(entry["date"]),
+                dateutil.parser.parse(entry["start_time"]) if entry["start_time"] is not None else None,
+                dateutil.parser.parse(entry["end_time"]) if entry["end_time"] is not None else None
             ))
         return history
 
@@ -65,10 +73,10 @@ class Database:
         row = cur.fetchone()
         if row is None:
             return None
-        ingredients = self.list_ingredients_for_recipe(row.recipe_id)
-        history = self.list_history_for_recipe(row.recipe_id)
-        schedule = self.list_schedule_for_recipe(row.recipe_id)
-        return FullRecipe(row.recipe_id, row.name, ingredients, row.prep, row.recipe, history, schedule)
+        ingredients = self.list_ingredients_for_recipe(row["recipe_id"])
+        history = self.list_history_for_recipe(row["recipe_id"])
+        schedule = self.list_schedule_for_recipe(row["recipe_id"])
+        return FullRecipe(row["recipe_id"], row["name"], ingredients, row["prep"], row["recipe"], history, schedule)
 
     def get_recipe_entry_by_id(self, recipe_id: int) -> Optional[RecipeEntry]:
         cur = self.conn.cursor()
@@ -76,8 +84,8 @@ class Database:
         row = cur.fetchone()
         if row is None:
             return None
-        ingredients = self.list_ingredients_for_recipe(row.recipe_id)
-        return RecipeEntry(row.recipe_id, row.name, ingredients, row.prep, row.recipe)
+        ingredients = self.list_ingredients_for_recipe(row["recipe_id"])
+        return RecipeEntry(row["recipe_id"], row["name"], ingredients, row["prep"], row["recipe"])
 
     def save_recipe(self, recipe: NewRecipe) -> FullRecipe:
         cur = self.conn.cursor()
@@ -97,9 +105,9 @@ class Database:
         cur = self.conn.cursor()
         schedule = []
         for row in cur.execute("SELECT recipe_id, date FROM schedule"):
-            recipe = self.get_recipe_entry_by_id(row.recipe_id)
+            recipe = self.get_recipe_entry_by_id(row["recipe_id"])
             schedule.append(ScheduleEntry(
-                dateutil.parser.parse(row.date),
+                dateutil.parser.parse(row["date"]),
                 recipe
             ))
         return schedule
@@ -108,11 +116,11 @@ class Database:
         cur = self.conn.cursor()
         history = []
         for row in cur.execute("SELECT recipe_id, date, start_time, end_time FROM history"):
-            recipe = self.get_recipe_entry_by_id(row.recipe_id)
+            recipe = self.get_recipe_entry_by_id(row["recipe_id"])
             history.append(HistoryEntry(
-                dateutil.parser.parse(row.date),
-                dateutil.parser.parse(row.start_time) if row.start_time is not None else None,
-                dateutil.parser.parse(row.end_time) if row.end_time is not None else None,
+                dateutil.parser.parse(row["date"]),
+                dateutil.parser.parse(row["start_time"]) if row["start_time"] is not None else None,
+                dateutil.parser.parse(row["end_time"]) if row["end_time"] is not None else None,
                 recipe
             ))
         return history
