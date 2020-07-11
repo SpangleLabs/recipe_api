@@ -7,7 +7,7 @@ create table if not exists recipes
 	recipe text not null
 );
 
-create unique if not exists index recipes_recipe_id_uindex
+create unique index if not exists  recipes_recipe_id_uindex
 	on recipes (recipe_id);
 
 create table if not exists ingredients
@@ -23,7 +23,7 @@ create table if not exists ingredients
 	item text not null
 );
 
-create unique if not exists index ingredients_ingredient_id_uindex
+create unique index if not exists ingredients_ingredient_id_uindex
 	on ingredients (ingredient_id);
 
 create table if not exists history
@@ -40,10 +40,10 @@ create table if not exists history
 	end_time text
 );
 
-create unique if not exists index history_history_id_uindex
+create unique index if not exists history_history_id_uindex
 	on history (history_id);
 
-create unique if not exists index history_date_uindex
+create unique index if not exists history_date_uindex
 	on history (date);
 
 create table if not exists schedule
@@ -58,10 +58,10 @@ create table if not exists schedule
 	date text not null
 );
 
-create unique if not exists index schedule_schedule_id_uindex
+create unique index if not exists schedule_schedule_id_uindex
 	on schedule (schedule_id);
 
-create unique if not exists index schedule_date_uindex
+create unique index if not exists schedule_date_uindex
 	on schedule (date);
 
 
