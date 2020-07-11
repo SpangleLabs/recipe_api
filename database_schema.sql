@@ -4,6 +4,7 @@ create table if not exists recipes
 		constraint recipes_pk
 			primary key autoincrement,
 	name text not null,
+	prep text not null,
 	recipe text not null
 );
 

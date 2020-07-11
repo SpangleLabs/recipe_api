@@ -27,11 +27,11 @@ class Database:
     def list_recipes(self) -> List[FullRecipe]:
         cur = self.conn.cursor()
         recipes = []
-        for row in cur.execute("SELECT recipe_id, name, recipe FROM recipes"):
+        for row in cur.execute("SELECT recipe_id, name, prep, recipe FROM recipes"):
             ingredients = self.list_ingredients_for_recipe(row.recipe_id)
             history = self.list_history_for_recipe(row.recipe_id)
             schedule = self.list_schedule_for_recipe(row.recipe_id)
-            recipes.append(FullRecipe(row.recipe_id, row.name, ingredients, row.recipe, history, schedule))
+            recipes.append(FullRecipe(row.recipe_id, row.name, ingredients, row.prep, row.recipe, history, schedule))
         return recipes
 
     def list_ingredients_for_recipe(self, recipe_id: int) -> List[Ingredient]:
@@ -61,23 +61,23 @@ class Database:
 
     def get_recipe_by_id(self, recipe_id: int) -> Optional[FullRecipe]:
         cur = self.conn.cursor()
-        cur.execute("SELECT recipe_id, name, recipe FROM recipes WHERE recipe_id = ?", (recipe_id,))
+        cur.execute("SELECT recipe_id, name, prep, recipe FROM recipes WHERE recipe_id = ?", (recipe_id,))
         row = cur.fetchone()
         if row is None:
             return None
         ingredients = self.list_ingredients_for_recipe(row.recipe_id)
         history = self.list_history_for_recipe(row.recipe_id)
         schedule = self.list_schedule_for_recipe(row.recipe_id)
-        return FullRecipe(row.recipe_id, row.name, ingredients, row.recipe, history, schedule)
+        return FullRecipe(row.recipe_id, row.name, ingredients, row.prep, row.recipe, history, schedule)
 
     def get_recipe_entry_by_id(self, recipe_id: int) -> Optional[RecipeEntry]:
         cur = self.conn.cursor()
-        cur.execute("SELECT recipe_id, name, recipe FROM recipes WHERE recipe_id = ?", (recipe_id,))
+        cur.execute("SELECT recipe_id, name, prep, recipe FROM recipes WHERE recipe_id = ?", (recipe_id,))
         row = cur.fetchone()
         if row is None:
             return None
         ingredients = self.list_ingredients_for_recipe(row.recipe_id)
-        return RecipeEntry(row.recipe_id, row.name, ingredients, row.recipe)
+        return RecipeEntry(row.recipe_id, row.name, ingredients, row.prep, row.recipe)
 
     def save_recipe(self, recipe: NewRecipe) -> FullRecipe:
         cur = self.conn.cursor()

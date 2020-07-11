@@ -44,6 +44,7 @@ def add_recipe():
     new_recipe = NewRecipe(
         data["name"],
         data["ingredients"],
+        data["prep"],
         data["recipe"]
     )
     recipe = get_db().save_recipe(new_recipe)

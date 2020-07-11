@@ -7,16 +7,18 @@ class NewRecipe:
             self,
             name: str,
             ingredients: List['Ingredient'],
+            prep: str,
             recipe: str
     ):
         self.name = name
         self.ingredients = ingredients
+        self.prep = prep
         self.recipe = recipe
 
 
 class RecipeEntry(NewRecipe):
-    def __init__(self, recipe_id: int, name: str, ingredients: List['Ingredient'], recipe: str):
-        super().__init__(name, ingredients, recipe)
+    def __init__(self, recipe_id: int, name: str, ingredients: List['Ingredient'], prep: str, recipe: str):
+        super().__init__(name, ingredients, prep, recipe)
         self.recipe_id = recipe_id
 
     def to_json(self):
@@ -24,6 +26,7 @@ class RecipeEntry(NewRecipe):
             "recipe_id": self.recipe_id,
             "name": self.name,
             "ingredients": [i.to_json() for i in self.ingredients],
+            "prep": self.prep,
             "recipe": self.recipe
         }
 
@@ -34,15 +37,12 @@ class FullRecipe(RecipeEntry):
             recipe_id: int,
             name: str,
             ingredients: List['Ingredient'],
+            prep: str,
             recipe: str,
             history: List['HistoryEntryForRecipe'],
             schedule: List['ScheduleEntryForRecipe']
     ):
-        super().__init__(recipe_id, name, ingredients, recipe)
-        self.recipe_id = recipe_id
-        self.name = name
-        self.ingredients = ingredients
-        self.recipe = recipe
+        super().__init__(recipe_id, name, ingredients, prep, recipe)
         self.history = history
         self.schedule = schedule
 
@@ -51,6 +51,7 @@ class FullRecipe(RecipeEntry):
             "recipe_id": self.recipe_id,
             "name": self.name,
             "ingredients": [i.to_json() for i in self.ingredients],
+            "prep": self.prep,
             "recipe": self.recipe,
             "history": [h.to_json() for h in self.history],
             "schedule": [s.to_json() for s in self.schedule]
