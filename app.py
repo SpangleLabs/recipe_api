@@ -1,6 +1,7 @@
 import flask
 from flask import Flask
 
+from data import NewRecipe, Ingredient
 from database import Database
 
 app = Flask(__name__)
@@ -19,7 +20,20 @@ def list_recipes():
 
 @app.route("/recipes", methods=["POST"])
 def add_recipe():
-    return "Not yet implemented"
+    data = flask.request.get_json()
+    ingredients = []
+    for ingredient in data["ingredients"]:
+        ingredients.append(Ingredient(
+            ingredient["amount"],
+            ingredient["item"]
+        ))
+    new_recipe = NewRecipe(
+        data["name"],
+        data["ingredients"],
+        data["recipe"]
+    )
+    recipe = db.save_recipe(new_recipe)
+    return flask.jsonify(recipe.to_json())
 
 
 @app.route("/recipes/<recipe_id>")

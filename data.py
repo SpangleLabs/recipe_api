@@ -2,6 +2,18 @@ import datetime
 from typing import Optional, List
 
 
+class NewRecipe:
+    def __init__(
+            self,
+            name: str,
+            ingredients: List['Ingredient'],
+            recipe: str
+    ):
+        self.name = name,
+        self.ingredients = ingredients,
+        self.recipe = recipe
+
+
 class FullRecipe:
     def __init__(
             self,

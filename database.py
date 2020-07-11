@@ -3,7 +3,7 @@ from typing import List, Optional
 
 import dateutil.parser
 
-from data import Ingredient, FullRecipe, ScheduleEntryForRecipe, HistoryEntryForRecipe
+from data import Ingredient, FullRecipe, ScheduleEntryForRecipe, HistoryEntryForRecipe, NewRecipe
 
 
 class Database:
@@ -65,3 +65,14 @@ class Database:
         history = self.list_history_for_recipe(row.recipe_id)
         schedule = self.list_schedule_for_recipe(row.recipe_id)
         return FullRecipe(row.recipe_id, row.name, ingredients, row.recipe, history, schedule)
+
+    def save_recipe(self, recipe: NewRecipe) -> FullRecipe:
+        cur = self.conn.cursor()
+        cur.execute("INSERT INTO recipes (name, recipe) VALUES (?, ?)", (recipe.name, recipe.recipe))
+        recipe_id = cur.lastrowid
+        for ingredient in recipe.ingredients:
+            cur.execute(
+                "INSERT INTO ingredients (recipe_id, amount, item) VALUES (?, ?, ?)",
+                (recipe_id, ingredient.amount, ingredient.item)
+            )
+        return self.get_recipe_by_id(recipe_id)
