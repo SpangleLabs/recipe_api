@@ -1,5 +1,5 @@
 import sqlite3
-from typing import List
+from typing import List, Optional
 
 import dateutil.parser
 
@@ -54,3 +54,14 @@ class Database:
                 dateutil.parser.parse(entry.end_time) if entry.end_time is not None else None
             ))
         return history
+
+    def get_recipe_by_id(self, recipe_id: int) -> Optional[FullRecipe]:
+        cur = self.conn.cursor()
+        cur.execute("SELECT recipe_id, name, recipe FROM recipes WHERE recipe_id = ?", (recipe_id,))
+        row = cur.fetchone()
+        if row is None:
+            return None
+        ingredients = self.list_ingredients_for_recipe(row.recipe_id)
+        history = self.list_history_for_recipe(row.recipe_id)
+        schedule = self.list_schedule_for_recipe(row.recipe_id)
+        return FullRecipe(row.recipe_id, row.name, ingredients, row.recipe, history, schedule)

@@ -24,7 +24,11 @@ def add_recipe():
 
 @app.route("/recipes/<recipe_id>")
 def show_recipe(recipe_id):
-    return {}
+    recipe = db.get_recipe_by_id(recipe_id)
+    if recipe is None:
+        flask.abort(404)
+        return None
+    return flask.jsonify(recipe.to_json())
 
 
 @app.route("/schedule")
