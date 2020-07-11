@@ -10,7 +10,7 @@ db = Database()
 
 @app.route('/')
 def hello_world():
-    return 'Hello World!'
+    return "Hello World, let's cook!"
 
 
 @app.route("/recipes")
