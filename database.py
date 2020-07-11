@@ -81,7 +81,10 @@ class Database:
 
     def save_recipe(self, recipe: NewRecipe) -> FullRecipe:
         cur = self.conn.cursor()
-        cur.execute("INSERT INTO recipes (name, recipe) VALUES (?, ?)", (recipe.name, recipe.recipe))
+        cur.execute(
+            "INSERT INTO recipes (name, prep, recipe) VALUES (?, ?, ?)",
+            (recipe.name, recipe.prep, recipe.recipe)
+        )
         recipe_id = cur.lastrowid
         for ingredient in recipe.ingredients:
             cur.execute(
