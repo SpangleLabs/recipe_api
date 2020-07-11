@@ -43,6 +43,9 @@ create table if not exists history
 create unique if not exists index history_history_id_uindex
 	on history (history_id);
 
+create unique if not exists index history_date_uindex
+	on history (date);
+
 create table if not exists schedule
 (
 	schedule_id integer not null
@@ -57,5 +60,8 @@ create table if not exists schedule
 
 create unique if not exists index schedule_schedule_id_uindex
 	on schedule (schedule_id);
+
+create unique if not exists index schedule_date_uindex
+	on schedule (date);
 
 

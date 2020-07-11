@@ -3,7 +3,8 @@ from typing import List, Optional
 
 import dateutil.parser
 
-from data import Ingredient, FullRecipe, ScheduleEntryForRecipe, HistoryEntryForRecipe, NewRecipe
+from data import Ingredient, FullRecipe, ScheduleEntryForRecipe, HistoryEntryForRecipe, NewRecipe, ScheduleEntry, \
+    RecipeEntry, HistoryEntry
 
 
 class Database:
@@ -66,6 +67,15 @@ class Database:
         schedule = self.list_schedule_for_recipe(row.recipe_id)
         return FullRecipe(row.recipe_id, row.name, ingredients, row.recipe, history, schedule)
 
+    def get_recipe_entry_by_id(self, recipe_id: int) -> Optional[RecipeEntry]:
+        cur = self.conn.cursor()
+        cur.execute("SELECT recipe_id, name, recipe FROM recipes WHERE recipe_id = ?", (recipe_id,))
+        row = cur.fetchone()
+        if row is None:
+            return None
+        ingredients = self.list_ingredients_for_recipe(row.recipe_id)
+        return RecipeEntry(row.recipe_id, row.name, ingredients, row.recipe)
+
     def save_recipe(self, recipe: NewRecipe) -> FullRecipe:
         cur = self.conn.cursor()
         cur.execute("INSERT INTO recipes (name, recipe) VALUES (?, ?)", (recipe.name, recipe.recipe))
@@ -76,3 +86,27 @@ class Database:
                 (recipe_id, ingredient.amount, ingredient.item)
             )
         return self.get_recipe_by_id(recipe_id)
+
+    def list_schedule(self) -> List[ScheduleEntry]:
+        cur = self.conn.cursor()
+        schedule = []
+        for row in cur.execute("SELECT recipe_id, date FROM schedule"):
+            recipe = self.get_recipe_entry_by_id(row.recipe_id)
+            schedule.append(ScheduleEntry(
+                dateutil.parser.parse(row.date),
+                recipe
+            ))
+        return schedule
+
+    def list_history(self) -> List[HistoryEntry]:
+        cur = self.conn.cursor()
+        history = []
+        for row in cur.execute("SELECT recipe_id, date, start_time, end_time FROM history"):
+            recipe = self.get_recipe_entry_by_id(row.recipe_id)
+            history.append(HistoryEntry(
+                dateutil.parser.parse(row.date),
+                dateutil.parser.parse(row.start_time) if row.start_time is not None else None,
+                dateutil.parser.parse(row.end_time) if row.end_time is not None else None,
+                recipe
+            ))
+        return history

@@ -47,12 +47,18 @@ def show_recipe(recipe_id):
 
 @app.route("/schedule")
 def show_schedule():
-    return {}
+    entries = db.list_schedule()
+    return flask.jsonify({
+        entry.date: entry.to_json()
+    } for entry in entries)
 
 
 @app.route("/history")
 def show_history():
-    return {}
+    entries = db.list_history()
+    return flask.jsonify({
+        entry.date: entry.to_json()
+    } for entry in entries)
 
 
 if __name__ == '__main__':
