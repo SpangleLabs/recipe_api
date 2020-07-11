@@ -1,11 +1,25 @@
 import flask
-from flask import Flask
 
 from data import NewRecipe, Ingredient
 from database import Database
 
-app = Flask(__name__)
-db = Database()
+app = flask.Flask(__name__)
+
+DATABASE = '/path/to/database.db'
+
+
+def get_db():
+    db = getattr(flask.g, '_database', None)
+    if db is None:
+        db = flask.g._database = Database()
+    return db
+
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(flask.g, '_database', None)
+    if db is not None:
+        db.close()
 
 
 @app.route('/')
@@ -15,7 +29,7 @@ def hello_world():
 
 @app.route("/recipes")
 def list_recipes():
-    return flask.jsonify([r.to_json() for r in db.list_recipes()])
+    return flask.jsonify([r.to_json() for r in get_db().list_recipes()])
 
 
 @app.route("/recipes", methods=["POST"])
@@ -32,13 +46,13 @@ def add_recipe():
         data["ingredients"],
         data["recipe"]
     )
-    recipe = db.save_recipe(new_recipe)
+    recipe = get_db().save_recipe(new_recipe)
     return flask.jsonify(recipe.to_json())
 
 
 @app.route("/recipes/<recipe_id>")
 def show_recipe(recipe_id):
-    recipe = db.get_recipe_by_id(recipe_id)
+    recipe = get_db().get_recipe_by_id(recipe_id)
     if recipe is None:
         flask.abort(404)
         return None
@@ -47,18 +61,22 @@ def show_recipe(recipe_id):
 
 @app.route("/schedule")
 def show_schedule():
-    entries = db.list_schedule()
-    return flask.jsonify({
-        entry.date: entry.to_json()
-    } for entry in entries)
+    entries = get_db().list_schedule()
+    return flask.jsonify(
+        {
+            entry.date: entry.to_json() for entry in entries
+        }
+    )
 
 
 @app.route("/history")
 def show_history():
-    entries = db.list_history()
-    return flask.jsonify({
-        entry.date: entry.to_json()
-    } for entry in entries)
+    entries = get_db().list_history()
+    return flask.jsonify(
+        {
+            entry.date: entry.to_json() for entry in entries
+        }
+    )
 
 
 if __name__ == '__main__':

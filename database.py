@@ -21,6 +21,9 @@ class Database:
             cur.executescript(f.read())
         self.conn.commit()
 
+    def close(self):
+        self.conn.close()
+
     def list_recipes(self) -> List[FullRecipe]:
         cur = self.conn.cursor()
         recipes = []
