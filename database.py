@@ -99,6 +99,7 @@ class Database:
                 "INSERT INTO ingredients (recipe_id, amount, item) VALUES (?, ?, ?)",
                 (recipe_id, ingredient.amount, ingredient.item)
             )
+        self.conn.commit()
         return self.get_recipe_by_id(recipe_id)
 
     def list_schedule(self) -> List[ScheduleEntry]:
