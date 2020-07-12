@@ -45,7 +45,7 @@ def add_recipe():
         ))
     new_recipe = NewRecipe(
         data["name"],
-        data["ingredients"],
+        ingredients,
         data["prep"],
         data["recipe"]
     )
