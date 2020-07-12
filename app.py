@@ -2,8 +2,10 @@ import flask
 
 from data import NewRecipe, Ingredient
 from database import Database
+from flask_cors import CORS
 
 app = flask.Flask(__name__)
+CORS(app)
 
 DATABASE = '/path/to/database.db'
 
